@@ -1,5 +1,6 @@
 package com.example.appfinal.View
 
+import android.media.Image
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -51,37 +52,56 @@ class LandingActivity : ComponentActivity() {
     @Composable
     fun Estructura(modifier: Modifier = Modifier) {
         var busqueda by remember { mutableStateOf("") }
+        var filtro = R.drawable.icono_filtro
+        var promPrincipal = R.drawable.bg_compose_background
+
 
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier.fillMaxSize()
         ) {
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = Color.Blue)
                     .padding(16.dp),
-                contentAlignment = Alignment.Center
+                horizontalArrangement = Arrangement.Center
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    NumberTextField(
-                        label = "Buscar...",
-                        value = busqueda,
-                        onValueChange = { busqueda = it },
-                        modifier = Modifier.width(300.dp).padding(end = 8.dp)
-                    )
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_launcher_background),
-                        contentDescription = "filtro",
-                        modifier = Modifier.size(55.dp)
-                    )
-                }
+                NumberTextField(
+                    label = "Buscar...",
+                    value = busqueda,
+                    onValueChange = { busqueda = it },
+                    modifier = Modifier.width(300.dp).padding(end = 8.dp)
+                )
+                Image(
+                    painter = painterResource(id = filtro),
+                    contentDescription = "filtro",
+                    modifier = Modifier.size(45.dp)
+                        .padding(start = 10.dp,top = 10.dp )
+
+                )
             }
+
+            Image(
+                painter = painterResource(id = promPrincipal),
+                contentDescription = "promPrincipal",
+                modifier = Modifier.fillMaxWidth()
+                    .padding(top = 10.dp)
+            )
+
+
         }
+    }
+
+    @Composable
+    fun item(imagen : Image, nombre : String, precio : String, precioAnterior : String){
+        Image(
+            painter = painterResource(id = imagen),
+            contentDescription = "imagen",
+            modifier = Modifier.size(150.dp)
+                .padding(end = 10.dp)
+        )
+
     }
 
     @Composable
@@ -94,7 +114,7 @@ class LandingActivity : ComponentActivity() {
                 )
             },
             value = value,
-            onValueChange = onValueChange, // v ->
+            onValueChange = onValueChange,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = modifier,
