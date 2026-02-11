@@ -1,23 +1,28 @@
 package com.example.appfinal.View
 
-import android.media.Image
+import android.R.attr.onClick
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.text.font.FontWeight
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -35,6 +40,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.appfinal.R
 import com.example.appfinal.View.ui.theme.AppFinalTheme
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.style.TextDecoration
+import com.example.appfinal.Model.Producto
+
 
 class LandingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,24 +53,29 @@ class LandingActivity : ComponentActivity() {
         setContent {
             AppFinalTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-
+                    Estructura()
                 }
             }
         }
     }
 
     @Composable
-    fun Estructura(modifier: Modifier = Modifier) {
+    fun Estructura() {
+
         var busqueda by remember { mutableStateOf("") }
-        var filtro = R.drawable.icono_filtro
-        var promPrincipal = R.drawable.bg_compose_background
 
+        val productos = listOf(
+            Producto(R.drawable.ic_launcher_background, "Prod 1", "$100", "$150"),
+            Producto(R.drawable.ic_launcher_background, "Prod 2", "$200", "$250"),
+            Producto(R.drawable.ic_launcher_background, "Prod 3", "$300", "$350"),
+            Producto(R.drawable.ic_launcher_background, "Prod 4", "$400", "$450"),
+            Producto(R.drawable.ic_launcher_background, "Prod 4", "$400", "$450"),
+            Producto(R.drawable.ic_launcher_background, "Prod 4", "$400", "$450"),
+            Producto(R.drawable.ic_launcher_background, "Prod 4", "$400", "$450"),
+            )
 
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier.fillMaxSize()
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -71,37 +86,93 @@ class LandingActivity : ComponentActivity() {
                     label = "Buscar...",
                     value = busqueda,
                     onValueChange = { busqueda = it },
-                    modifier = Modifier.width(300.dp).padding(end = 8.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
                 )
+
                 Image(
-                    painter = painterResource(id = filtro),
+                    painter = painterResource(id = R.drawable.icono_filtro),
                     contentDescription = "filtro",
                     modifier = Modifier.size(45.dp)
-                        .padding(start = 10.dp,top = 10.dp )
-
                 )
             }
 
-            Image(
-                painter = painterResource(id = promPrincipal),
-                contentDescription = "promPrincipal",
-                modifier = Modifier.fillMaxWidth()
-                    .padding(top = 10.dp)
-            )
 
 
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(16.dp)
+            ) {
+
+                item{
+                    Image(
+                        painter = painterResource(id = R.drawable.bg_compose_background),
+                        contentDescription = "fondo landing",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                items(productos.chunked(2)) { fila -> //fila = a lista de 2 producots
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        fila.forEach { producto ->
+                            ProductoCard(producto, Modifier.weight(1f))
+                        }
+
+                        if (fila.size == 1) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
         }
     }
 
-    @Composable
-    fun item(imagen : Image, nombre : String, precio : String, precioAnterior : String){
-        Image(
-            painter = painterResource(id = imagen),
-            contentDescription = "imagen",
-            modifier = Modifier.size(150.dp)
-                .padding(end = 10.dp)
-        )
 
+
+    @Composable
+    fun ProductoCard(producto: Producto, modifier: Modifier = Modifier) {
+
+        Card(
+            modifier = modifier
+                .padding(8.dp),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(8.dp)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(12.dp)
+            ) {
+
+                Image(
+                    painter = painterResource(id = producto.imagen),
+                    contentDescription = producto.nombre,
+                    modifier = Modifier.size(140.dp)
+                )
+
+                Text(
+                    text = producto.nombre,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = producto.precio,
+                    color = Color(0xFF2E7D32),
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = producto.precioAnterior,
+                    color = Color.Gray,
+                    textDecoration = TextDecoration.LineThrough
+
+                )
+            }
+        }
     }
 
     @Composable
@@ -125,7 +196,10 @@ class LandingActivity : ComponentActivity() {
     @Composable
     fun GreetingPreview() {
         AppFinalTheme {
-            Estructura()
+            Surface(modifier = Modifier.fillMaxSize()){
+                Estructura()
+            }
+
         }
     }
 }
