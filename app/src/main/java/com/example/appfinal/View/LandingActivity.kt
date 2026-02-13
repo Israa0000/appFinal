@@ -1,6 +1,5 @@
 package com.example.appfinal.View
 
-import android.R.attr.onClick
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,10 +38,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.appfinal.R
 import com.example.appfinal.View.ui.theme.AppFinalTheme
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.navigation.NavController
+import com.example.appfinal.Model.Categoria
 import com.example.appfinal.Model.Producto
+import com.example.appfinal.ViewModel.sampledata.Categorias
+import com.example.appfinal.ViewModel.sampledata.Productos
 
 
 class LandingActivity : ComponentActivity() {
@@ -53,26 +53,16 @@ class LandingActivity : ComponentActivity() {
         setContent {
             AppFinalTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    Estructura()
+                    MyApp()
                 }
             }
         }
     }
 
     @Composable
-    fun Estructura() {
+    fun Estructura(navController: NavController) {
 
         var busqueda by remember { mutableStateOf("") }
-
-        val productos = listOf(
-            Producto(R.drawable.ic_launcher_background, "Prod 1", "$100", "$150"),
-            Producto(R.drawable.ic_launcher_background, "Prod 2", "$200", "$250"),
-            Producto(R.drawable.ic_launcher_background, "Prod 3", "$300", "$350"),
-            Producto(R.drawable.ic_launcher_background, "Prod 4", "$400", "$450"),
-            Producto(R.drawable.ic_launcher_background, "Prod 4", "$400", "$450"),
-            Producto(R.drawable.ic_launcher_background, "Prod 4", "$400", "$450"),
-            Producto(R.drawable.ic_launcher_background, "Prod 4", "$400", "$450"),
-            )
 
         Column(modifier = Modifier.fillMaxSize()) {
 
@@ -98,8 +88,6 @@ class LandingActivity : ComponentActivity() {
                 )
             }
 
-
-
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -114,24 +102,47 @@ class LandingActivity : ComponentActivity() {
                     )
                 }
 
-                items(productos.chunked(2)) { fila -> //fila = a lista de 2 producots
+                items(Productos.productos.chunked(2)) { fila -> //fila = a lista de 2 producots
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         fila.forEach { producto ->
                             ProductoCard(producto, Modifier.weight(1f))
+                        //aqui weight significa el peso de cada carta,
+                        // si una columna el size es de 2, con un weight 1 significa que va a tomar la mitad
                         }
 
                         if (fila.size == 1) {
                             Spacer(modifier = Modifier.weight(1f))
+                        // y aqui quiere decir que si hay un producto el space tomara el espacio de otro
+                        }
+                    }
+                }
+
+                items(Categorias.categorias.chunked(3)){ fila ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ){
+                        fila.forEach { categoria ->
+                            CategoriasCard(
+                                categoria = categoria,
+                                onClick = {
+                                    navController.navigate("categoria/${categoria.nombre}")
+                                      },
+                                modifier = Modifier.weight(1f))
+                        }
+                        if (fila.size < 3){
+                            repeat(3 - fila.size){
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
                         }
                     }
                 }
             }
         }
     }
-
 
 
     @Composable
@@ -176,6 +187,31 @@ class LandingActivity : ComponentActivity() {
     }
 
     @Composable
+    fun CategoriasCard(
+        categoria: Categoria,
+        modifier: Modifier = Modifier,
+        onClick: () -> Unit
+    ) {
+        Card(
+            modifier = modifier.padding(8.dp),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(8.dp),
+            onClick = onClick
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = categoria.imagen),
+                    contentDescription = categoria.nombre
+                )
+                Text(text = categoria.nombre)
+            }
+        }
+    }
+
+
+    @Composable
     fun NumberTextField(label : String, value : String, onValueChange : (String) -> Unit,modifier : Modifier = Modifier){//hacemos el proceso de abstraccion con esta funcion
 
         TextField(
@@ -194,12 +230,11 @@ class LandingActivity : ComponentActivity() {
 
     @Preview(showBackground = true, showSystemUi = true)
     @Composable
-    fun GreetingPreview() {
-        AppFinalTheme {
-            Surface(modifier = Modifier.fillMaxSize()){
-                Estructura()
-            }
-
+    fun GreetingPreview() {    AppFinalTheme {
+        Surface(modifier = Modifier.fillMaxSize()){
+            val navController = androidx.navigation.compose.rememberNavController()
+            Estructura(navController = navController)
         }
+    }
     }
 }
